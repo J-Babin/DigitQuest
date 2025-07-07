@@ -15,7 +15,7 @@ public class SolutionEntityTest {
 
     @Test
     void shouldPersistSolutionWithGeneratedId() {
-        // GIVEN - Créer une solution avec données réalistes
+        // On cree une solution
         SolutionEntity solution = new SolutionEntity();
         solution.setPos1(1);
         solution.setPos2(6);
@@ -32,31 +32,32 @@ public class SolutionEntityTest {
 
         System.out.println("AVANT PERSIST: " + solution); // ← DEBUG
 
-        // Vérifier qu'avant sauvegarde, pas d'ID
+        // On va verifier si les champs id, createdAt et updatedAt sont null car il sont remplis automatiquement
         assertThat(solution.getId()).isNull();
         assertThat(solution.getCreatedAt()).isNull();
+        assertThat(solution.getUpdateAt()).isNull();
 
-        // WHEN - Sauvegarder en base
+        // Sauvegarde en BDD
         SolutionEntity savedSolution = entityManager.persistAndFlush(solution);
 
         System.out.println("APRÈS PERSIST: " + savedSolution); // ← DEBUG
 
-        // Priorité 1 : Auto-génération
+        // Check de l'auto generation
         assertThat(savedSolution.getId()).isNotNull();
         assertThat(savedSolution.getCreatedAt()).isNotNull();
         assertThat(savedSolution.getUpdateAt()).isNotNull();
 
-        // Priorité 3 : Récupération par ID (test de la persistance réelle)
-        entityManager.clear(); // Vide le cache Hibernate
+        //Test de la persistance de la donnee en cherchant la solution
+        entityManager.clear();
         SolutionEntity foundSolution = entityManager.find(SolutionEntity.class, savedSolution.getId());
 
         assertThat(foundSolution).isNotNull();
         assertThat(foundSolution.getId()).isEqualTo(savedSolution.getId());
         assertThat(foundSolution.getPos1()).isEqualTo(1);
-        assertThat(foundSolution.getPos5()).isEqualTo(5); // Position centrale
+        assertThat(foundSolution.getPos5()).isEqualTo(5);
         assertThat(foundSolution.getPos9()).isEqualTo(3);
 
-        // Priorité 4 : Métadonnées
+        // Verifie les autres donne / metadonnee
         assertThat(foundSolution.getIsValid()).isTrue();
         assertThat(foundSolution.getCalculationTimeMs()).isEqualTo(250L);
         assertThat(foundSolution.getGridJson()).isEqualTo("{\"values\":[1,6,8,2,5,9,4,7,3]}");
@@ -67,20 +68,16 @@ public class SolutionEntityTest {
 
     @Test
     void shouldPersistMultipleSolutions() {
-        // GIVEN - Deux solutions différentes
         SolutionEntity solution1 = createValidSolution(1, 6, 8, 2, 5, 9, 4, 7, 3);
         SolutionEntity solution2 = createValidSolution(9, 3, 7, 4, 2, 1, 8, 6, 5);
 
-        // WHEN - Sauvegarder les deux
         SolutionEntity saved1 = entityManager.persistAndFlush(solution1);
         SolutionEntity saved2 = entityManager.persistAndFlush(solution2);
 
-        // THEN - IDs différents générés
         assertThat(saved1.getId()).isNotNull();
         assertThat(saved2.getId()).isNotNull();
         assertThat(saved1.getId()).isNotEqualTo(saved2.getId());
 
-        // Données distinctes
         assertThat(saved1.getPos1()).isEqualTo(1);
         assertThat(saved2.getPos1()).isEqualTo(9);
 
@@ -89,15 +86,14 @@ public class SolutionEntityTest {
 
     @Test
     void shouldHandleInvalidSolution() {
-        // GIVEN - Solution marquée comme invalide
+        // On cree une solution invalide IsValid = false et temps de calacul a 0
         SolutionEntity invalidSolution = createValidSolution(1, 2, 3, 4, 5, 6, 7, 8, 9);
-        invalidSolution.setIsValid(false); // Solution invalide
-        invalidSolution.setCalculationTimeMs(0L); // Pas de temps de calcul
+        invalidSolution.setIsValid(false);
+        invalidSolution.setCalculationTimeMs(0L);
 
-        // WHEN - Sauvegarder
         SolutionEntity saved = entityManager.persistAndFlush(invalidSolution);
 
-        // THEN - Même les solutions invalides sont persistées
+        // check de persistance meme si isValid = false
         assertThat(saved.getId()).isNotNull();
         assertThat(saved.getIsValid()).isFalse();
         assertThat(saved.getCalculationTimeMs()).isEqualTo(0L);
