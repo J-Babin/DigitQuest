@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -89,5 +91,16 @@ public class SolutionServiceTest {
         assertThatThrownBy(() -> SolutionService.displaySolution(badSolutionId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Le solution n'existe pas");
+    }
+
+    @Test
+    void ShouldDisplayAllSolutions() {
+        List<SolutionEntity> allSolutions = SolutionService.findAllSolutions();
+        assertThat(allSolutions).isNotNull();
+        assertThat(allSolutions).hasSize(4);
+
+        for (SolutionEntity solution : allSolutions) {
+            System.out.println(solution);
+        }
     }
 }
