@@ -78,7 +78,7 @@ public class SolutionServiceTest {
 
     @Test
     void getOneSolution() {
-        SolutionEntity solution = SolutionService.displaySolution(solution1Id);
+        SolutionEntity solution = SolutionService.finById(solution1Id);
         assertThat(solution).isNotNull();
         assertThat(solution.getId()).isEqualTo(solution1Id);
         assertThat(solution.getGridJson()).isEqualTo("{\"type\":\"test1\"}");
@@ -88,7 +88,7 @@ public class SolutionServiceTest {
     void shouldThrowExceptionForInvalidId() {
         // Tester avec un id qui n'existe pas
         Long badSolutionId = 9999999L;
-        assertThatThrownBy(() -> SolutionService.displaySolution(badSolutionId))
+        assertThatThrownBy(() -> SolutionService.finById(badSolutionId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Le solution n'existe pas");
     }
