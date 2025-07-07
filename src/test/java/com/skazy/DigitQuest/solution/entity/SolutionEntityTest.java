@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
 public class SolutionEntityTest {
@@ -16,26 +17,19 @@ public class SolutionEntityTest {
     @Test
     void shouldPersistSolutionWithGeneratedId() {
         // On cree une solution
-        SolutionEntity solution = new SolutionEntity();
-        solution.setPos1(1);
-        solution.setPos2(6);
-        solution.setPos3(8);
-        solution.setPos4(2);
-        solution.setPos5(5);
-        solution.setPos6(9);
-        solution.setPos7(4);
-        solution.setPos8(7);
-        solution.setPos9(3);
-        solution.setIsValid(true);
-        solution.setCalculationTimeMs(250L);
-        solution.setGridJson("{\"values\":[1,6,8,2,5,9,4,7,3]}");
+        SolutionEntity solution = SolutionEntity.builder()
+                .positions("168259473")
+                .gridJson("{\"values\":[1,6,8,2,5,9,4,7,3]}")
+                .isValid(true)
+                .calculationTimeMs(250L)
+                .build();
 
         System.out.println("AVANT PERSIST: " + solution); // ← DEBUG
 
         // On va verifier si les champs id, createdAt et updatedAt sont null car il sont remplis automatiquement
         assertThat(solution.getId()).isNull();
         assertThat(solution.getCreatedAt()).isNull();
-        assertThat(solution.getUpdateAt()).isNull();
+        assertThat(solution.getUpdatedAt()).isNull();
 
         // Sauvegarde en BDD
         SolutionEntity savedSolution = entityManager.persistAndFlush(solution);
@@ -45,7 +39,7 @@ public class SolutionEntityTest {
         // Check de l'auto generation
         assertThat(savedSolution.getId()).isNotNull();
         assertThat(savedSolution.getCreatedAt()).isNotNull();
-        assertThat(savedSolution.getUpdateAt()).isNotNull();
+        assertThat(savedSolution.getUpdatedAt()).isNotNull();
 
         //Test de la persistance de la donnee en cherchant la solution
         entityManager.clear();
@@ -53,23 +47,27 @@ public class SolutionEntityTest {
 
         assertThat(foundSolution).isNotNull();
         assertThat(foundSolution.getId()).isEqualTo(savedSolution.getId());
-        assertThat(foundSolution.getPos1()).isEqualTo(1);
-        assertThat(foundSolution.getPos5()).isEqualTo(5);
-        assertThat(foundSolution.getPos9()).isEqualTo(3);
+        assertThat(foundSolution.getPositions()).isEqualTo("168259473");
+
+        // Tester la methode getPosition
+        assertThat(foundSolution.getPosition(1)).isEqualTo(1);
+        assertThat(foundSolution.getPosition(5)).isEqualTo(5);
+        assertThat(foundSolution.getPosition(9)).isEqualTo(3);
 
         // Verifie les autres donne / metadonnee
         assertThat(foundSolution.getIsValid()).isTrue();
         assertThat(foundSolution.getCalculationTimeMs()).isEqualTo(250L);
         assertThat(foundSolution.getGridJson()).isEqualTo("{\"values\":[1,6,8,2,5,9,4,7,3]}");
 
-        System.out.println("✅ Test réussi ! ID généré = " + savedSolution.getId());
+
+        System.out.println("Test réussi ! ID généré = " + savedSolution.getId());
 
     }
 
     @Test
     void shouldPersistMultipleSolutions() {
-        SolutionEntity solution1 = createValidSolution(1, 6, 8, 2, 5, 9, 4, 7, 3);
-        SolutionEntity solution2 = createValidSolution(9, 3, 7, 4, 2, 1, 8, 6, 5);
+        SolutionEntity solution1 = createValidSolution("168259473");
+        SolutionEntity solution2 = createValidSolution("937421865");
 
         SolutionEntity saved1 = entityManager.persistAndFlush(solution1);
         SolutionEntity saved2 = entityManager.persistAndFlush(solution2);
@@ -78,18 +76,21 @@ public class SolutionEntityTest {
         assertThat(saved2.getId()).isNotNull();
         assertThat(saved1.getId()).isNotEqualTo(saved2.getId());
 
-        assertThat(saved1.getPos1()).isEqualTo(1);
-        assertThat(saved2.getPos1()).isEqualTo(9);
+        assertThat(saved1.getPosition(1)).isEqualTo(1);
+        assertThat(saved2.getPosition(1)).isEqualTo(9);
 
-        System.out.println("✅ Deux solutions persistées : " + saved1.getId() + " et " + saved2.getId());
+        System.out.println("Deux solutions persistées : " + saved1.getId() + " et " + saved2.getId());
     }
 
     @Test
     void shouldHandleInvalidSolution() {
         // On cree une solution invalide IsValid = false et temps de calacul a 0
-        SolutionEntity invalidSolution = createValidSolution(1, 2, 3, 4, 5, 6, 7, 8, 9);
-        invalidSolution.setIsValid(false);
-        invalidSolution.setCalculationTimeMs(0L);
+        SolutionEntity invalidSolution = SolutionEntity.builder()
+                .positions("123456789")
+                .gridJson("{\"values\":[1,2,3,4,5,6,7,8,9]}")
+                .isValid(false)        // Override de la valeur par défaut
+                .calculationTimeMs(0L)  // Override de la valeur par défaut
+                .build();
 
         SolutionEntity saved = entityManager.persistAndFlush(invalidSolution);
 
@@ -98,25 +99,132 @@ public class SolutionEntityTest {
         assertThat(saved.getIsValid()).isFalse();
         assertThat(saved.getCalculationTimeMs()).isEqualTo(0L);
 
-        System.out.println("✅ Solution invalide persistée avec ID = " + saved.getId());
+        System.out.println("Solution invalide persistée avec ID = " + saved.getId());
     }
 
-    private SolutionEntity createValidSolution(int pos1, int pos2, int pos3, int pos4, int pos5,
-                                               int pos6, int pos7, int pos8, int pos9) {
-        SolutionEntity solution = new SolutionEntity();
-        solution.setPos1(pos1);
-        solution.setPos2(pos2);
-        solution.setPos3(pos3);
-        solution.setPos4(pos4);
-        solution.setPos5(pos5);
-        solution.setPos6(pos6);
-        solution.setPos7(pos7);
-        solution.setPos8(pos8);
-        solution.setPos9(pos9);
-        solution.setIsValid(true);
-        solution.setCalculationTimeMs(100L);
-        solution.setGridJson(String.format("{\"values\":[%d,%d,%d,%d,%d,%d,%d,%d,%d]}",
-                pos1, pos2, pos3, pos4, pos5, pos6, pos7, pos8, pos9));
-        return solution;
+    @Test
+    void shouldUseDefaultValues() {
+        // Test des valeurs par défaut du Builder
+        SolutionEntity solution = SolutionEntity.builder()
+                .positions("123456789")
+                .gridJson("{\"values\":[1,2,3,4,5,6,7,8,9]}")
+                .build();
+
+        // Vérification des valeurs par défaut AVANT persistance
+        assertThat(solution.getIsValid()).isFalse();
+        assertThat(solution.getCalculationTimeMs()).isEqualTo(0L);
+
+        SolutionEntity saved = entityManager.persistAndFlush(solution);
+
+        assertThat(saved.getIsValid()).isFalse();
+        assertThat(saved.getCalculationTimeMs()).isEqualTo(0L);
+
+        System.out.println("Valeurs par défaut fonctionnent ! ID = " + saved.getId());
+    }
+
+    @Test
+    void shouldTestGetPositionMethod() {
+        // On test de la méthode getPosition()
+        SolutionEntity solution = SolutionEntity.builder()
+                .positions("987654321")
+                .gridJson("{\"test\": true}")
+                .build();
+
+        // Test de chaque position
+        assertThat(solution.getPosition(1)).isEqualTo(9);
+        assertThat(solution.getPosition(2)).isEqualTo(8);
+        assertThat(solution.getPosition(3)).isEqualTo(7);
+        assertThat(solution.getPosition(4)).isEqualTo(6);
+        assertThat(solution.getPosition(5)).isEqualTo(5);
+        assertThat(solution.getPosition(6)).isEqualTo(4);
+        assertThat(solution.getPosition(7)).isEqualTo(3);
+        assertThat(solution.getPosition(8)).isEqualTo(2);
+        assertThat(solution.getPosition(9)).isEqualTo(1);
+
+        System.out.println("Méthode getPosition() fonctionne !");
+    }
+
+    @Test
+    void shouldTestSetPositionMethod() {
+        SolutionEntity solution = SolutionEntity.builder()
+                .positions("111111111")  // Toutes les positions à 1
+                .gridJson("{\"test\": true}")
+                .build();
+
+        // changement de quelque position
+        solution.setPosition(1, 9);
+        solution.setPosition(5, 5);
+        solution.setPosition(9, 3);
+
+        // Verif des changement
+        assertThat(solution.getPosition(1)).isEqualTo(9);
+        assertThat(solution.getPosition(2)).isEqualTo(1);  // Inchangé
+        assertThat(solution.getPosition(5)).isEqualTo(5);
+        assertThat(solution.getPosition(9)).isEqualTo(3);
+
+        // Diff de la sequence attendu et de la sequence obtenu
+        assertThat(solution.getPositions()).isEqualTo("911151113");
+
+        System.out.println("Méthode setPosition() fonctionne !");
+    }
+
+    @Test
+    void shouldValidateGetPositionBounds() {
+        // Test des validations de getPosition()
+        SolutionEntity solution = SolutionEntity.builder()
+                .positions("123456789")
+                .gridJson("{\"test\": true}")
+                .build();
+
+        // Index trop petit
+        assertThatThrownBy(() -> solution.getPosition(0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("L'index doit être entre 1 et 9");
+
+        // Index trop grand
+        assertThatThrownBy(() -> solution.getPosition(10))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("L'index doit être entre 1 et 9");
+
+        System.out.println("Validation des bornes de getPosition() fonctionne !");
+    }
+
+    @Test
+    void shouldValidateSetPositionBounds() {
+        // Test des validations de setPosition()
+        SolutionEntity solution = SolutionEntity.builder()
+                .positions("123456789")
+                .gridJson("{\"test\": true}")
+                .build();
+
+        // Index invalide
+        assertThatThrownBy(() -> solution.setPosition(0, 5))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("L'index doit être entre 1 et 9");
+
+        assertThatThrownBy(() -> solution.setPosition(10, 5))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("L'index doit être entre 1 et 9");
+
+        // Valeur invalide
+        assertThatThrownBy(() -> solution.setPosition(1, 0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("La valeur doit être entre 1 et 9");
+
+        assertThatThrownBy(() -> solution.setPosition(1, 10))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("La valeur doit être entre 1 et 9");
+
+        System.out.println("Validation des bornes de setPosition() fonctionne !");
+    }
+
+    private SolutionEntity createValidSolution(String positions) {
+        return SolutionEntity.builder()
+                .positions(positions)
+                .gridJson(String.format("{\"values\":[%s]}",
+                        String.join(",", positions.split(""))))  // "123456789" -> "1,2,3,4,5,6,7,8,9"
+                .isValid(true)
+                .calculationTimeMs(100L)
+                .build();
     }
 }

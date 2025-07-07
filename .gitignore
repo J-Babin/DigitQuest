@@ -1,4 +1,4 @@
-HELP.md
+README.md
 target/
 .mvn/
 .mvn/wrapper/maven-wrapper.jar
@@ -32,4 +32,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### BDD ###
 *.db
+
+### Coverage Report ###
+htmlReport/
+
+### Logs ###
+logs/
