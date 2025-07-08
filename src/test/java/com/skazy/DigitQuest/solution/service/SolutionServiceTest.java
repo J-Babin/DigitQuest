@@ -79,7 +79,7 @@ public class SolutionServiceTest {
 
     @Test
     void getOneSolution() {
-        SolutionEntity solution = solutionService.finById(solution1Id);
+        SolutionEntity solution = solutionService.findById(solution1Id);
         assertThat(solution).isNotNull();
         assertThat(solution.getId()).isEqualTo(solution1Id);
         assertThat(solution.getGridJson()).isEqualTo("{\"type\":\"test1\"}");
@@ -89,7 +89,7 @@ public class SolutionServiceTest {
     void shouldThrowExceptionForInvalidId() {
         // Tester avec un id qui n'existe pas
         Long badSolutionId = 9999999L;
-        assertThatThrownBy(() -> solutionService.finById(badSolutionId))
+        assertThatThrownBy(() -> solutionService.findById(badSolutionId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Le solution n'existe pas");
     }
@@ -127,7 +127,7 @@ public class SolutionServiceTest {
                 .isValid(false)
                 .build();
 
-        SolutionEntity solutionExisting = solutionService.finById(solution1Id);
+        SolutionEntity solutionExisting = solutionService.findById(solution1Id);
 
         System.out.println("Before modification : " + solutionExisting);
 
@@ -142,7 +142,7 @@ public class SolutionServiceTest {
     @Test
     @DisplayName("Doit trouver une solution par sont ID")
     void shouldFindSolutionById(){
-        SolutionEntity solution = solutionService.finById(solution1Id);
+        SolutionEntity solution = solutionService.findById(solution1Id);
 
         assertThat(solution).isNotNull();
         assertThat(solution.getId()).isEqualTo(solution1Id);
@@ -152,7 +152,7 @@ public class SolutionServiceTest {
     @Test
     @DisplayName("Doit delete la premiere solution")
     void shouldDeleteSolution(){
-        SolutionEntity solution = solutionService.finById(solution1Id);
+        SolutionEntity solution = solutionService.findById(solution1Id);
 
         assertThat(solution).isNotNull();
 

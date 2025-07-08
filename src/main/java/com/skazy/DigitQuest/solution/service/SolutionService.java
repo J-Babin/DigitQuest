@@ -18,7 +18,7 @@ public class SolutionService {
     private SolutionRepository solutionRepository;
     private final SolutionMapperDTO solutionMapper;
 
-    public SolutionEntity finById(Long solutionId) {
+    public SolutionEntity findById(Long solutionId) {
        Optional<SolutionEntity> optionalSolutionEntity = solutionRepository.findById(solutionId);
        return optionalSolutionEntity.orElseThrow(() -> new IllegalArgumentException("Le solution n'existe pas"));
     }
