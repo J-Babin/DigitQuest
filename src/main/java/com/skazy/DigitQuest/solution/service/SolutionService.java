@@ -1,7 +1,10 @@
 package com.skazy.DigitQuest.solution.service;
 
+import com.skazy.DigitQuest.solution.dto.mapper.SolutionMapperDTO;
+import com.skazy.DigitQuest.solution.dto.request.SolutionUpdateDTO;
 import com.skazy.DigitQuest.solution.entity.SolutionEntity;
 import com.skazy.DigitQuest.solution.repository.SolutionRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,7 @@ import java.util.Optional;
 public class SolutionService {
 
     private SolutionRepository solutionRepository;
+    private final SolutionMapperDTO solutionMapper;
 
     public SolutionEntity finById(Long solutionId) {
        Optional<SolutionEntity> optionalSolutionEntity = solutionRepository.findById(solutionId);
@@ -28,5 +32,39 @@ public class SolutionService {
 
         return allSolutions;
     }
+
+    public SolutionEntity createSolution(SolutionEntity solutionEntity) {
+        if (solutionEntity == null) {
+            throw new IllegalArgumentException("Le solution ne peux pas etre null");
+        }
+
+        return solutionRepository.save(solutionEntity);
+    }
+
+    public void deleteSolution(Long solutionId) {
+        Optional<SolutionEntity> optionalSolutionEntity = solutionRepository.findById(solutionId);
+
+        if (optionalSolutionEntity.isEmpty()) {
+            throw new IllegalArgumentException("La solution avec l'ID " + solutionId + " n'existe pas");
+        }
+
+        solutionRepository.deleteById(solutionId);
+
+        if (solutionRepository.existsById(solutionId)) {
+            throw new RuntimeException("Erreur lors de la suppression - la solution existe encore");
+        }
+    }
+
+    @Transactional
+    public SolutionEntity updateSolution(Long solutionId, SolutionUpdateDTO updatedSolution) {
+        SolutionEntity existingSolution = solutionRepository.findById(solutionId)
+                .orElseThrow(() -> new IllegalArgumentException("Solution non trouvée avec l'ID: " + solutionId));
+
+        solutionMapper.updateEntityFromDTO(existingSolution, updatedSolution);
+
+        //TODO: Faire une validation de modification si updatedSolution === celle qui se trouve en bdd
+        return solutionRepository.save(existingSolution);
+    }
+
 
 }

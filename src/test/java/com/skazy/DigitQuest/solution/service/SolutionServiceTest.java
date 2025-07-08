@@ -1,8 +1,10 @@
 package com.skazy.DigitQuest.solution.service;
 
+import com.skazy.DigitQuest.solution.dto.request.SolutionUpdateDTO;
 import com.skazy.DigitQuest.solution.entity.SolutionEntity;
 import com.skazy.DigitQuest.solution.repository.SolutionRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,9 +19,8 @@ public class SolutionServiceTest {
     @Autowired
     private SolutionRepository solutionRepository;
 
-
     @Autowired
-    private SolutionService SolutionService;
+    private SolutionService solutionService;
 
     private Long solution1Id;
 
@@ -78,7 +79,7 @@ public class SolutionServiceTest {
 
     @Test
     void getOneSolution() {
-        SolutionEntity solution = SolutionService.finById(solution1Id);
+        SolutionEntity solution = solutionService.finById(solution1Id);
         assertThat(solution).isNotNull();
         assertThat(solution.getId()).isEqualTo(solution1Id);
         assertThat(solution.getGridJson()).isEqualTo("{\"type\":\"test1\"}");
@@ -88,19 +89,76 @@ public class SolutionServiceTest {
     void shouldThrowExceptionForInvalidId() {
         // Tester avec un id qui n'existe pas
         Long badSolutionId = 9999999L;
-        assertThatThrownBy(() -> SolutionService.finById(badSolutionId))
+        assertThatThrownBy(() -> solutionService.finById(badSolutionId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Le solution n'existe pas");
     }
-
     @Test
     void ShouldDisplayAllSolutions() {
-        List<SolutionEntity> allSolutions = SolutionService.findAllSolutions();
+        List<SolutionEntity> allSolutions = solutionService.findAllSolutions();
         assertThat(allSolutions).isNotNull();
         assertThat(allSolutions).hasSize(4);
 
         for (SolutionEntity solution : allSolutions) {
             System.out.println(solution);
         }
+    }
+
+    @Test
+    @DisplayName("Le Test doit cree une nouvelle solution")
+    void shouldCreateSolution(){
+        SolutionEntity newSolution = SolutionEntity.builder()
+                .positions("234567891")
+                .gridJson("{\"type\":\"testNewSolution\"}")
+                .isValid(true)
+                .calculationTimeMs(100L)
+                .build();
+
+        SolutionEntity result = solutionService.createSolution(newSolution);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getPositions()).isEqualTo(newSolution.getPositions());
+    }
+
+    @Test
+    @DisplayName("Doit update une solution")
+    void shouldUpdateSolution(){
+        SolutionUpdateDTO updateDTO = SolutionUpdateDTO.builder()
+                .isValid(false)
+                .build();
+
+        SolutionEntity solutionExisting = solutionService.finById(solution1Id);
+
+        System.out.println("Before modification : " + solutionExisting);
+
+        SolutionEntity result = solutionService.updateSolution(solution1Id, updateDTO);
+
+        assertThat(result.getIsValid()).isFalse();
+
+        System.out.println("After modification : " + result);
+
+    }
+
+    @Test
+    @DisplayName("Doit trouver une solution par sont ID")
+    void shouldFindSolutionById(){
+        SolutionEntity solution = solutionService.finById(solution1Id);
+
+        assertThat(solution).isNotNull();
+        assertThat(solution.getId()).isEqualTo(solution1Id);
+        assertThat(solution.getGridJson()).isEqualTo("{\"type\":\"test1\"}");
+    }
+
+    @Test
+    @DisplayName("Doit delete la premiere solution")
+    void shouldDeleteSolution(){
+        SolutionEntity solution = solutionService.finById(solution1Id);
+
+        assertThat(solution).isNotNull();
+
+        solutionService.deleteSolution(solution1Id);
+
+        assertThat(solutionRepository.findById(solution1Id).isPresent()).isFalse();
+
     }
 }
