@@ -14,26 +14,24 @@ public class BacktrackingSolver {
     private static final int[] DIGITS = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     private static final int TARGET_VALUE = 66;
 
+    @Getter
+    private long totalCalculationTime;
     private final Boolean[] digitUsed = new Boolean[10];
     private final int[] solution = new int[9];
     ArrayList<int[]> allSolutions = new ArrayList<>();
-    @Getter
-    private long totalCalculationTime;
-
     private int numberOfSolutions = 0;
+    private final boolean strictSolver;
 
 
-    public static void main(String[] args) {
-        BacktrackingSolver solver = new BacktrackingSolver();
-        solver.startSolve();
+    public BacktrackingSolver(boolean typeOfSolver) {
+        this.strictSolver = typeOfSolver;
+
     }
-
 
     public List<SolutionEntity> startSolve() {
         Arrays.fill(digitUsed, false);
         long startTime = System.currentTimeMillis();
         this.backtrackingSolver(solution, digitUsed, 0);
-        this.printAllSolutions();
         totalCalculationTime = System.currentTimeMillis() - startTime;
 
         return createSolutionEntities();
@@ -42,8 +40,14 @@ public class BacktrackingSolver {
 
     public void backtrackingSolver(int[] solution, Boolean[] digitUsed, int posIndex) {
         if (posIndex == 9){
-            if (isValidSolution2(solution)) {
-                return;
+            if (!strictSolver) {
+                if (isValidSolution(solution)) {
+                    return;
+                }
+            }else{
+                if (isValidSolution2(solution)) {
+                    return;
+                }
             }
             return;
         }
@@ -64,6 +68,11 @@ public class BacktrackingSolver {
         }
     }
 
+    /**
+     * @param solution
+     * this method is for finding solutions with strict division to get whole numbers
+     * @return boolean
+     */
     public boolean isValidSolution(int[] solution) {
         int A = solution[0],  B = solution[1], C = solution[2];
         int D = solution[3],  E = solution[4], F = solution[5];
@@ -76,12 +85,18 @@ public class BacktrackingSolver {
         int result = A + ((13 * B) / C) + D + (12 * E) - F - 11 + ((G * H) / I) - 10;
 
         if  (result == TARGET_VALUE){
-            System.out.println(Arrays.toString(solution));
-            System.out.println(numberOfSolutions);
+            numberOfSolutions++;
+            allSolutions.add(solution.clone());
         }
         return result == TARGET_VALUE;
     }
 
+
+    /**
+     * @param solution
+     * this method is for finding solutions, accepting that the values may be duplicates.
+     * @return boolean
+     */
     public boolean isValidSolution2(int[] solution) {
         int A = solution[0], B = solution[1], C = solution[2];
         int D = solution[3], E = solution[4], F = solution[5];

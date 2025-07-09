@@ -1,5 +1,6 @@
 package com.skazy.DigitQuest.solution.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.skazy.DigitQuest.puzzle.algorithm.BacktrackingSolver;
 import com.skazy.DigitQuest.solution.dto.mapper.SolutionMapperDTO;
 import com.skazy.DigitQuest.solution.dto.request.SolutionCreateDTO;
@@ -12,7 +13,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -118,10 +118,23 @@ public class SolutionController {
 
 
     @PostMapping("/generate")
-    @Transactional
-    public List<SolutionEntity> generateAndSaveSolutions() {
-        BacktrackingSolver solver = new BacktrackingSolver();
+    @Operation(summary = "Generation de toutes les solutions possibles",
+            description = "Retourne toutes les solution trouvees")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200" , description = "Solution Genere"),
+            @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
+    })
+    public List<SolutionEntity> generateAndSaveSolutions(@RequestBody JsonNode jsonNode) {
+        boolean solverStrict = jsonNode.get(("solverStrict")).asBoolean();
+        BacktrackingSolver solver = new BacktrackingSolver(solverStrict);
+        List<SolutionEntity> allSolutions = solver.startSolve();
+        try {
+            solutionService.saveMultipleSolutions(allSolutions);
+        }
+        catch (Exception e) {
+            return allSolutions;
+        }
 
-        return solver.startSolve();
+        return allSolutions;
     }
 }

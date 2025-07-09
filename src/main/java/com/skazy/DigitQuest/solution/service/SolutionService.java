@@ -40,7 +40,7 @@ public class SolutionService {
 
         return solutionRepository.save(solutionEntity);
     }
-
+    @Transactional
     public void deleteSolution(Long solutionId) {
         Optional<SolutionEntity> optionalSolutionEntity = solutionRepository.findById(solutionId);
 
@@ -64,6 +64,16 @@ public class SolutionService {
 
         //TODO: Faire une validation de modification si updatedSolution === celle qui se trouve en bdd
         return solutionRepository.save(existingSolution);
+    }
+
+    @Transactional
+    public void saveMultipleSolutions(List<SolutionEntity> solutions) {
+        try {
+            solutionRepository.saveAll(solutions);
+        }
+        catch (Exception ignored) {
+
+        }
     }
 
 
