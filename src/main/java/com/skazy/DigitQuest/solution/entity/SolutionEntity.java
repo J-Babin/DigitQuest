@@ -37,6 +37,9 @@ public class SolutionEntity {
     @Builder.Default
     private Long calculationTimeMs = 0L;
 
+    @Column
+    private Integer totalSolutions = 0;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

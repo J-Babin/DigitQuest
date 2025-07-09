@@ -1,5 +1,6 @@
 package com.skazy.DigitQuest.solution.controller;
 
+import com.skazy.DigitQuest.puzzle.algorithm.BacktrackingSolver;
 import com.skazy.DigitQuest.solution.dto.mapper.SolutionMapperDTO;
 import com.skazy.DigitQuest.solution.dto.request.SolutionCreateDTO;
 import com.skazy.DigitQuest.solution.dto.request.SolutionUpdateDTO;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,7 +34,7 @@ public class SolutionController {
 
     @GetMapping("test")
     public ResponseEntity<String> test() {
-        return ResponseEntity.ok("Healt check");
+        return ResponseEntity.ok("Health check");
     }
 
     @GetMapping("/")
@@ -51,7 +53,7 @@ public class SolutionController {
     }
 
     @GetMapping("/solution/{id}")
-    @Operation(summary = "Récupére une solution",
+    @Operation(summary = "Récupère une solution",
             description = "Retourne la solution par son id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Liste des solutions récupérée avec succès"),
@@ -112,5 +114,14 @@ public class SolutionController {
         }catch (IllegalArgumentException e){
             return ResponseEntity.ok().build();
         }
+    }
+
+
+    @PostMapping("/generate")
+    @Transactional
+    public List<SolutionEntity> generateAndSaveSolutions() {
+        BacktrackingSolver solver = new BacktrackingSolver();
+
+        return solver.startSolve();
     }
 }
