@@ -6,6 +6,7 @@ import com.skazy.DigitQuest.solution.entity.SolutionEntity;
 import com.skazy.DigitQuest.solution.repository.SolutionRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,6 +40,14 @@ public class SolutionService {
         }
 
         return solutionRepository.save(solutionEntity);
+    }
+
+    public List<SolutionEntity> findBySpecificPosValue(@Param("index") Integer index, @Param("value") Integer value) {
+        List<SolutionEntity> result = solutionRepository.findBySpecificPosValue(index, value);
+        if (result.isEmpty()) {
+            throw new IllegalArgumentException("Le solution n'existe pas");
+        }
+        return result;
     }
     @Transactional
     public void deleteSolution(Long solutionId) {

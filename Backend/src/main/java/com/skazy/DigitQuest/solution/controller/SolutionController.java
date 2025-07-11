@@ -65,6 +65,24 @@ public class SolutionController {
         return ResponseEntity.ok(solutionResponseDTO);
     }
 
+    @PostMapping("solution/find")
+    @Operation(summary = "Trouver une solution en fonction de la position dans la grille d'une valeur ",
+            description = "Retourne la liste des solutions trouvees")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201" , description = "Creation de la nouvelle solution effectuee"),
+            @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
+    })
+    public ResponseEntity<List<SolutionEntity>> findBySpecificPosValue(@RequestBody JsonNode jsonNod) {
+        int index = jsonNod.get("index").asInt();
+        int value = jsonNod.get("value").asInt();
+        System.out.println(index );
+        System.out.println(value );
+        List<SolutionEntity> result = solutionService.findBySpecificPosValue(index, value);
+        if (result.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(result);
+    }
 
     @PostMapping("solution")
     @Operation(summary = "Creer une nouvelle solution",
