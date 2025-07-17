@@ -67,3 +67,13 @@ export default tseslint.config([
   },
 ])
 ```
+
+```
+ [vide]  [vide][][vide]   [66]
+ [+]     [*]     [-]      [=]
+ [13]    [12]    [11]     [10]
+ [*]     [+]     [+]      [-]
+ [vide]  [vide]  [vide]   [vide]
+ [:]   [vide][+]    [*][vide][:]
+
+```
