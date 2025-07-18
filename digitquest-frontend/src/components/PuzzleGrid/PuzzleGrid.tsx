@@ -1,13 +1,15 @@
-import { memo, type JSX } from "react";
-import Cell from "./Cell";
+import { memo, type ChangeEvent, type FC, type JSX } from "react";
+import Cell from "@/components/PuzzleGrid/Cell";
 
 interface GridData{
     [key: string]: string | null;
 }
 
+type PuzzleGridProps = {
+    onChange: (value: ChangeEvent<HTMLInputElement>) => void;
+}
 
-const PuzzleGridComponent = () => {
-    const NUMBER: number[] = [1,2,3,4,5,6,7,8,9];
+const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
     const ROW: number = 6;
     const COL: number = 7;
     const gridData: GridData = {
@@ -46,9 +48,9 @@ const PuzzleGridComponent = () => {
         const key = `${row}:${col}`; 
         if (shouldRenderCell(row, col)) {
             if (hasCell(key)) {
-                return <Cell key={key} index={key} disabled={true} value={gridData[key]}></Cell>;
+                return <Cell key={key} index={key} disabled={true} value={gridData[key]} onChanged={PuzzleGridProps.onChange}></Cell>;
             }else{
-                return <Cell key={key} index={key} disabled={false} ></Cell>;
+                return <Cell key={key} index={key} disabled={false} onChanged={PuzzleGridProps.onChange} ></Cell>;
             }
             
         }

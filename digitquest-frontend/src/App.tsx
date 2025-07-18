@@ -1,11 +1,14 @@
-import {PuzzleGrid} from "./components/PuzzleGrid/PuzzleGrid"
+import { useRoutes } from 'react-router-dom';
+import { routes } from '@/Router/Routes'
+import { Layout } from '@/components/Layout/Layout';
 
 function App() {
-  return (
-    <div className="bg-gray-400 h-screen w-screen ">
-      <PuzzleGrid/>
-    </div>
-  )
+   const routing = useRoutes(routes);
+    return (
+        <Layout>
+           {routing}
+        </Layout>
+    );
 }
 
-export default App
+export default App;
