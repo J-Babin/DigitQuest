@@ -63,3 +63,8 @@
     --secondary-bg: 0 4% 15%;
   }
 }
+
+@theme {
+  --color-navbarPrimary: #d5d9f7; 
+  --color-navbarSecondary: #D1D5DB;
+}

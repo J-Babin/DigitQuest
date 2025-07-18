@@ -1,7 +1,9 @@
 import { type RouteObject, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
+import Home from '@/Pages/Home';
+import PuzzlePage from '@/Pages/PuzzlePage';
 
-const PuzzlePage = lazy(() => import('@/Pages/PuzzlePage'));
+// const PuzzlePage = lazy(() => import('@/Pages/PuzzlePage'));
 
 
 // Composant de loading
@@ -21,7 +23,11 @@ const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
 export const routes: RouteObject[] = [
   {
     path: '/',
-    element: <Navigate to="/puzzle" replace />,
+    element: (
+      <LazyWrapper>
+        <Home />
+      </LazyWrapper>
+    ),
   },
   {
     path: '/puzzle',
@@ -31,6 +37,10 @@ export const routes: RouteObject[] = [
       </LazyWrapper>
     ),
   },
+
+
+
+
 //   {
 //     path: '/dashboard',
 //     element: (
@@ -78,6 +88,6 @@ export const routes: RouteObject[] = [
 //   },
   {
     path: '*',
-    element: <Navigate to="/puzzle" replace />,
+    element: <Navigate to="/" replace />,
   },
 ];
