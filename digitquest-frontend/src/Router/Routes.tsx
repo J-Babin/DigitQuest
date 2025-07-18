@@ -1,9 +1,11 @@
 import { type RouteObject, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
-import Home from '@/Pages/Home';
-import PuzzlePage from '@/Pages/PuzzlePage';
+import Home from '@/Pages/HomePage';
 
-// const PuzzlePage = lazy(() => import('@/Pages/PuzzlePage'));
+
+const PuzzlePage = lazy(() => import('@/Pages/PuzzlePage'));
+const SearchSolutionPage = lazy(() => import('@/Pages/SearchSolutionPage'));
+const HistoryPage = lazy(() => import('@/Pages/HistoryPage'));
 
 
 // Composant de loading
@@ -37,7 +39,22 @@ export const routes: RouteObject[] = [
       </LazyWrapper>
     ),
   },
-
+  {
+    path: '/search',
+    element: (
+      <LazyWrapper>
+        <SearchSolutionPage />
+      </LazyWrapper>
+    ),
+  },
+  {
+    path: '/history',
+    element: (
+      <LazyWrapper>
+        <HistoryPage />
+      </LazyWrapper> 
+    ),
+  }, 
 
 
 

@@ -83,4 +83,4 @@ const PuzzlePage = () => {
     );
 }
 
-export default PuzzlePage;
+export default memo(PuzzlePage);

@@ -40,8 +40,8 @@ const NavBar = () => {
         { id: 'home', label: 'Accueil', path: '/', icon: Home },
         { id: 'puzzle', label: 'Puzzle', path: '/puzzle', icon: Gamepad2 },
         // { id: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: BarChart3 },
-        // { id: 'solutions', label: 'Solutions', path: '/solutions', icon: Search },
-        // { id: 'history', label: 'Historique', path: '/history', icon: History },
+        { id: 'solutions', label: 'Solutions', path: '/search', icon: Search },
+        { id: 'history', label: 'Historique', path: '/history', icon: History },
         // { id: 'settings', label: 'Paramètres', path: '/settings', icon: Settings },
     ];
         
@@ -55,13 +55,11 @@ const NavBar = () => {
 
     return (
         <>
-            <div className="fixed z-1 top-0 left-0 h-screen w-28 m-0 flex flex-col bg-navbarPrimary text-white shadow-lg justify-around items-center">
-                {/* Logo */}
-                <div className="w-12 h-12 bg-white/30 rounded-xl flex items-center justify-center mb-4 mt-4">
+            <div className="fixed z-1 top-0 left-0 h-screen w-16 m-0 flex flex-col  text-white bg-navbarPrimary justify-around items-center">
+                <div className="w-12 h-12 bg-white/30  rounded-xl flex items-center justify-center mb-10 mt-4">
                     <span className="text-2xl">🧩</span>
                 </div>
 
-                {/* Menu Items */}
                 {menuItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = location.pathname === item.path;
@@ -73,8 +71,8 @@ const NavBar = () => {
                             onMouseEnter={(e) => handleMouseEnter(item.id, e)}
                             onMouseLeave={handleMouseLeave}
                             className={`
-                                group relative w-12 h-12 rounded-xl flex items-center justify-center 
-                                transition-all duration-200 hover:scale-110 mb-2
+                                group relative w-9 h-9 rounded-xl flex items-center justify-center 
+                                transition-all duration-200 hover:scale-110 mb-5
                                 ${isActive 
                                     ? 'bg-white/30 text-gray-800 shadow-lg scale-110' 
                                     : 'bg-white/10 text-gray-600 hover:bg-white/20'
@@ -82,7 +80,7 @@ const NavBar = () => {
                             `}
                             title={item.label}
                         >
-                            <Icon size={24} />
+                            <Icon size={20} />
                         </button>
                     );
                 })}

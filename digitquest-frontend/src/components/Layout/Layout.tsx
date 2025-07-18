@@ -10,7 +10,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="fixed inset-0 -z-10 overflow-hidden bg-navbarPrimary">
             <NavBar />
             <div 
-                className="absolute z-1 inset-0 rounded-l-[30px] ml-28 shadow-lg overflow-hidden"
+                className="absolute z-1 inset-0 rounded-l-[30px] ml-16 shadow-2xl overflow-hidden"
                 style={{
                 background: `
                     radial-gradient(ellipse at top right, rgba(199, 210, 254, 0.9) 0%, transparent 90%),
@@ -64,7 +64,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                 {/* Blob 3 - Violet clair INTENSE */}
                 <div 
-                    className="absolute animate-blob-float"
+                    className="absolute animate-blob-float -z-10"
                     style={{
                         width: '180px',
                         height: '180px',
