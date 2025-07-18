@@ -1,14 +1,16 @@
 import { useRoutes } from 'react-router-dom';
-import { routes } from '@/Router/Routes'
+import { routes } from '@/router/Routes'
 import { Layout } from '@/components/Layout/Layout';
-import NavBar from '@/components/Navbar/NavBar';
+import { DeviceGuard } from './components/DeviceGuard';
 
 function App() {
    const routing = useRoutes(routes);
     return (
-        <Layout>
-            {routing}
-        </Layout> 
+        <DeviceGuard>
+            <Layout>
+                {routing}
+            </Layout> 
+        </DeviceGuard>
     );
 }
 

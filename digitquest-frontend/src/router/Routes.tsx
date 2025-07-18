@@ -1,11 +1,11 @@
 import { type RouteObject, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
-import Home from '@/Pages/HomePage';
+import Home from '@/pages/HomePage';
 
 
-const PuzzlePage = lazy(() => import('@/Pages/PuzzlePage'));
-const SearchSolutionPage = lazy(() => import('@/Pages/SearchSolutionPage'));
-const HistoryPage = lazy(() => import('@/Pages/HistoryPage'));
+const PuzzlePage = lazy(() => import('@/pages/PuzzlePage'));
+const SearchSolutionPage = lazy(() => import('@/pages/SearchSolutionPage'));
+const HistoryPage = lazy(() => import('@/pages/HistoryPage'));
 
 
 // Composant de loading
