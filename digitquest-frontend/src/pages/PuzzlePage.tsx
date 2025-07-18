@@ -35,6 +35,12 @@ const usePuzzleLogic = () => {
             "1": false, "2": false, "3": false, "4": false, "5": false,
             "6": false, "7": false, "8": false, "9": false
         });
+        const inputs = document.querySelectorAll('input[type="text"]');
+        inputs.forEach(input => {
+            if (!input.hasAttribute('disabled')) {
+                (input as HTMLInputElement).value = "";
+            }
+        });
         toast.success("Puzzle reset");
     }, []);
 
@@ -65,20 +71,23 @@ const PuzzlePage = () => {
         <div className="flex flex-col w-full h-full">
             <h1 className="text-2xl font-bold text-center mb-4">Digit Quest Puzzle</h1>
             <PuzzleGrid onChange={onAddValue} />
-            {/* <div className="flex gap-4 m-4">
-                <button 
-                    className="bg-blue-500 text-white px-4 py-2 rounded" 
-                    onClick={handleSubmit}
-                >
-                    Submit Solution
+
+            <div className="flex justify-center">                
+                <button className="relative inline-flex items-center justify-center p-0.5 mb-4 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
+                    <span className="relative px-3 py-1.5 transition-all ease-in duration-75 bg-white dark:bg-gray-700 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
+                        Submit
+                    </span>
                 </button>
+
                 <button 
-                    className="bg-red-500 text-white px-4 py-2 rounded" 
+                    className="relative inline-flex items-center justify-center p-0.5 mb-4 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-700 via-red-500 to-red-300 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400"
                     onClick={resetPuzzle}
                 >
-                    Reset
+                    <span className="relative px-3 py-1.5 transition-all ease-in duration-75 bg-white dark:bg-gray-700 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
+                        Reset
+                    </span>
                 </button>
-            </div> */}
+            </div>
         </div>
     );
 }

@@ -14,7 +14,7 @@ export const useDeviceDetection = (): DeviceInfo => {
     isTablet: false,
     isMobile: false,
     screenWidth: 1920,
-    screenHeight: 1080,
+    screenHeight: 450,
   });
 
   useEffect(() => {
@@ -25,7 +25,9 @@ export const useDeviceDetection = (): DeviceInfo => {
       // Breakpoints
       const isMobile = width < 768;
       const isTablet = width >= 768 && width < 1024;
+      // const isDesktop = width >= 1024 && height >= 450;
       const isDesktop = width >= 1024;
+
       
       setDeviceInfo({
         isDesktop,

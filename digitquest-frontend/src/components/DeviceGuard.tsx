@@ -7,7 +7,7 @@ interface DeviceGuardProps {
 }
 
 export const DeviceGuard: React.FC<DeviceGuardProps> = ({ children }) => {
-  const { isDesktop, isMobile, isTablet, screenWidth } = useDeviceDetection();
+  const { isDesktop, isMobile, isTablet, screenWidth, screenHeight } = useDeviceDetection();
   if (isDesktop) {
     return <>{children}</>;
   }
@@ -31,9 +31,9 @@ export const DeviceGuard: React.FC<DeviceGuardProps> = ({ children }) => {
 
         <div className="bg-gray-100 rounded-lg p-4 mb-6">
           <p className="text-sm text-gray-500">
-            <strong>Résolution actuelle :</strong> {screenWidth}px
+            <strong>Résolution actuelle :</strong> {screenWidth}px / {screenHeight}px
             <br />
-            <strong>Minimum requis :</strong> 1024px
+            <strong>Minimum requis :</strong> 1024px (largeur) 450px (hauteur)
           </p>
         </div>
 
