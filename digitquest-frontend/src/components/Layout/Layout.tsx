@@ -24,7 +24,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     {children}
                 </div>
                 <div 
-                    className="absolute animate-blob-float"
+                    className="absolute animate-blob-float -z-10"
                     style={{
                         width: '280px',
                         height: '280px',
@@ -44,7 +44,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                 {/* Blob 2 - Rose INTENSE (maintenant à gauche) */}
                 <div 
-                    className="absolute animate-blob-float"
+                    className="absolute animate-blob-float -z-10"
                     style={{
                         width: '220px',
                         height: '220px',

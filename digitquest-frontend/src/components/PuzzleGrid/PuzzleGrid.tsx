@@ -1,17 +1,23 @@
-import { memo, type ChangeEvent, type FC, type JSX } from "react";
+import { memo, useState, type ChangeEvent, type FC, type JSX } from "react";
 import Cell from "@/components/PuzzleGrid/Cell";
 
 interface GridData{
     [key: string]: string | null;
 }
 
+interface Solution {
+    [key: string]: string;
+}
+
 type PuzzleGridProps = {
     onChange: (value: ChangeEvent<HTMLInputElement>) => void;
+    solutions?: { positions: string | Number[];}
 }
 
 const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
     const ROW: number = 6;
     const COL: number = 7;
+    const orderKey = [0, 5, 9, 6, 2, 4, 7, 10, 7]
     const gridData: GridData = {
         "1:4": "-",
         "1:7": "66",
@@ -33,6 +39,23 @@ const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
         "6:7": ":",
     };
 
+    const solutionIndexes : Solution = {
+        "1:1": "0",
+        "1:3": "4",
+        "1:5": "5",
+        "5:1": "1",
+        "5:3": "3",
+        "5:5": "6",
+        "5:7": "8",
+        "6:2": "2",
+        "6:6": "7",
+    }
+
+
+    const solutionArray = PuzzleGridProps.solutions?.positions.toString().split("").map(Number);
+
+    
+
     const hasCell = (position: string | number): boolean => {
         return position in gridData
     }
@@ -45,12 +68,19 @@ const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
     };
     
     const renderCell = (row: number, col: number): JSX.Element => {
-        const key = `${row}:${col}`; 
+        const key: string = `${row}:${col}`; 
         if (shouldRenderCell(row, col)) {
             if (hasCell(key)) {
                 return <Cell key={key} index={key} disabled={true} value={gridData[key]} onChanged={PuzzleGridProps.onChange}></Cell>;
-            }else{
-                return <Cell key={key} index={key} disabled={false} onChanged={PuzzleGridProps.onChange} ></Cell>;
+            }else if (solutionArray && solutionArray.length > 0) {
+                const value = solutionArray[Number(solutionIndexes[key])];
+                orderKey.shift();
+                return <Cell key={key} index={key} disabled={true} value={value} onChanged={PuzzleGridProps.onChange}></Cell>;
+            }   
+            else{
+
+                return <Cell key={key} index={key} disabled={false} onChanged={PuzzleGridProps.onChange}></Cell>;
+
             }
             
         }
@@ -58,8 +88,8 @@ const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
     };
 
     return(
-        <div className="flex flex-col items-center justify-center h-full">
-            <div className="grid grid-rows-6 grid-cols-7 gap-2 w-1/2 place-content-center">
+        <div className="flex flex-col items-center justify-center h-full w-full">
+            <div className="grid grid-rows-6 grid-cols-7 gap-2  place-content-center">
                 {Array.from({ length: ROW }, (_, rowIndex) =>
                     Array.from({ length: COL }, (_, colIndex) =>
                         renderCell(rowIndex + 1, colIndex + 1)

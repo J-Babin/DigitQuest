@@ -1,4 +1,4 @@
-import { test } from "@/api/test";
+import { test } from "@/api/solutions";
 import { memo } from "react";
 
 
