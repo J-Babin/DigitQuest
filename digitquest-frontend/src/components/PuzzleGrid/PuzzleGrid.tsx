@@ -1,54 +1,20 @@
 import { memo, type ChangeEvent, type FC, type JSX } from "react";
 import Cell from "@/components/PuzzleGrid/Cell";
+import { gridData, solutionDefaultValue, solutionIndexes } from "@/data/PuzzleData";
 
-interface GridData{
-    [key: string]: string | null;
-}
 
-interface Solution {
-    [key: string]: string;
-}
 
 type PuzzleGridProps = {
     onChange: (value: ChangeEvent<HTMLInputElement>) => void;
     solutions?: { positions: string | Number[];}
+    searchPage?: boolean;
 }
 
 const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
     const ROW: number = 6;
     const COL: number = 7;
     const orderKey = [0, 5, 9, 6, 2, 4, 7, 10, 7]
-    const gridData: GridData = {
-        "1:4": "-",
-        "1:7": "66",
-        "2:1": "+",
-        "2:3": "x",
-        "2:5": "-",
-        "2:7": "=",
-        "3:1": "13",
-        "3:3": "12",
-        "3:5": "11",
-        "3:7": "10",
-        "4:1": "x",
-        "4:3": "+",
-        "4:5": "+",
-        "4:7": "-",
-        "6:1": ":",
-        "6:3": "+",
-        "6:5": "x",
-        "6:7": ":",
-    };
-    const solutionIndexes : Solution = {
-        "1:1": "0",
-        "1:3": "4",
-        "1:5": "5",
-        "5:1": "1",
-        "5:3": "3",
-        "5:5": "6",
-        "5:7": "8",
-        "6:2": "2",
-        "6:6": "7",
-    }
+
     const solutionArray = PuzzleGridProps.solutions?.positions.toString().split("").map(Number);
 
     
@@ -73,7 +39,11 @@ const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
                 const value = solutionArray[Number(solutionIndexes[key])];
                 orderKey.shift();
                 return <Cell key={key} index={key} disabled={true} value={value} onChanged={PuzzleGridProps.onChange}></Cell>;
-            }   
+            }
+            else if (PuzzleGridProps.searchPage) {
+                const value = solutionDefaultValue[key];
+                return <Cell key={key} index={key} disabled={true} value={value} onChanged={PuzzleGridProps.onChange}></Cell>;
+            }
             else{
 
                 return <Cell key={key} index={key} disabled={false} onChanged={PuzzleGridProps.onChange}></Cell>;

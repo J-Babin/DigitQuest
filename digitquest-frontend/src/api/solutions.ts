@@ -41,5 +41,20 @@ export async function checkSolution(solution: string): Promise<void> {
   return response.data;
 }
 
+export async function getSolutionByPosition(index: number, value: number): Promise<void> {
+  let data = {
+    "index": index, 
+    "value": value
+  }
+  let response = await api.post('/solutions/solution/find', data);
+  return response.data;
+}
+
+export async function deleteAllSolutions(): Promise<void> {
+  let response = await api.delete('/solutions/deleteAll');
+  
+  return response.data;
+}
+
 
 
