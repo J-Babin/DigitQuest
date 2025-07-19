@@ -74,13 +74,13 @@ export async function deleteSolution(idSolution: string): Promise<void> {
 
 export async function modifySolution(idSolution: string, solution: string): Promise<void> {
   let originalSolution = await getSolutionById(idSolution);
-  console.log("originalSolution:", originalSolution);
   let data = {
     "positions": solution,
     "gridJson": originalSolution.gridJson,
     "isValid": false,
     "calculationTimeMs": 0
   }
+
   let response = await api.patch('/solutions/solution/update/' + idSolution, data);
   
   // return response.data;

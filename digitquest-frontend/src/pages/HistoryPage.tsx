@@ -86,7 +86,7 @@ const HistoryPage = () => {
                <div className="grid grid-cols-2 mx-2 gap-2 overflow-y-auto max-h-full w-screen">
                     {solutions.map((solution, index) => (
                         <div key={index} className="m-2 p-2 shadow-xl/30">
-                            <PuzzleGrid onChange={() => {}} solutions={solutions[index]} disabled={true} idSolution={solution.id}/>
+                            <PuzzleGrid onChange={() => {}} solutions={solutions[index]} disabled={true} idSolution={solutions[index].id}/>
                         </div>
                     ))}
                 </div>

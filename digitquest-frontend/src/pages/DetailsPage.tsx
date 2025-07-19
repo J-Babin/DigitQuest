@@ -1,5 +1,4 @@
 import { useLocation, useNavigate } from "react-router-dom";
-
 import { ArrowLeft, Calendar, MapPin, Grid } from "lucide-react";
 import { PuzzleGrid } from "@/components/PuzzleGrid/PuzzleGrid";
 import { ChangeEvent, memo, useCallback, useEffect, useState } from "react";
@@ -11,6 +10,7 @@ interface SolutionState {
     solution: number[];
     positions: string | Number[];
     idSolution: string;
+    previousPage?: string; 
     metadata: {
         id: string;
         createdAt: string;
@@ -31,38 +31,73 @@ const usePuzzleLogic = () => {
         "6": false, "7": false, "8": false, "9": false
     });
 
-    const addValue = useCallback((index: string, value: string, inputComponent: ChangeEvent<HTMLInputElement> ) => {
-        console.log("Adding value", solution);
-        if (numberUsed[value] ) {
-            console.error(`Digit ${value} is already used!`);
-            toast.error(`Digit ${value} is already used!`);
-            inputComponent.target.value = "";
+    const addValue = useCallback((index: string, value: string, inputComponent: ChangeEvent<HTMLInputElement>) => {
+        const oldValue = solution[index];
+
+        if (value && parseInt(value) <= 0) {
+            console.error("Value must be greater than 0");
+            toast.error("La valeur doit être supérieure à 0");
+            inputComponent.target.value = oldValue || "";
             return false;
         }
         
+        if (numberUsed[value] && oldValue !== value) {
+            console.error(`Digit ${value} is already used!`);
+            toast.error(`Digit ${value} is already used!`);
+            inputComponent.target.value = oldValue || "";
+            return false;
+        }
+    
         setSolution(prev => ({ ...prev, [index]: value }));
-        setNumberUsed(prev => ({ ...prev, [value]: true }));
+        setNumberUsed(prev => {
+            const updated = { ...prev };
+            
+            if (oldValue && oldValue !== value) {
+                updated[oldValue] = false;
+            }
+            updated[value] = true;
+            
+            return updated;
+        });
+        
+        toast.success(`Valeur ${value} modifiée à la position ${index}`);
         return true;
-    }, [numberUsed]);
+    }, [numberUsed, solution]);
 
-    const transformSolution = useCallback((solution: any) => {
+    const transformSolution = useCallback((solutionArray: number[]) => {
         let transformed: SolutionData = {};
+        let usedDigits: DigitIsUsed = {
+            "1": false, "2": false, "3": false, "4": false, "5": false,
+            "6": false, "7": false, "8": false, "9": false
+        };
+        
         let idx = 0;
         if (templateGridData && typeof templateGridData === "object") {
             Object.entries(templateGridData).forEach(([key, value]) => {
-                transformed[key] = solution[idx]
+                const digit = solutionArray[idx]?.toString();
+                if (digit) {
+                    transformed[key] = digit;
+                    usedDigits[digit as keyof DigitIsUsed] = true;
+                }
                 idx++;   
             });
-            
         }
+        
         setSolution(transformed);
-        Object.entries(numberUsed).forEach(([digit, used]) => {
-            if (transformed[digit]) {
-                setNumberUsed(prev => ({ ...prev, [digit]: true }));
-            }
-        });
+        setNumberUsed(usedDigits);
         return transformed;
     }, []);
+
+    const solutionToArray = useCallback((): number[] => {
+        const result: number[] = [];
+        if (templateGridData && typeof templateGridData === "object") {
+            Object.keys(templateGridData).forEach((key) => {
+                const value = solution[key] ? parseInt(solution[key]) : 0;
+                result.push(value);
+            });
+        }
+        return result;
+    }, [solution]);
 
     const resetPuzzle = useCallback(() => {
         setSolution({});
@@ -79,7 +114,15 @@ const usePuzzleLogic = () => {
         toast.success("Puzzle reset");
     }, []);
 
-    return { solution, numberUsed, addValue, resetPuzzle, setSolution, transformSolution };
+    return { 
+        solution, 
+        numberUsed, 
+        addValue, 
+        resetPuzzle, 
+        setSolution, 
+        transformSolution,
+        solutionToArray 
+    };
 };
 
 const DetailsPage = () => {
@@ -87,21 +130,19 @@ const DetailsPage = () => {
     const navigate = useNavigate();
     const [solutionData, setSolutionData] = useState<SolutionState | null>(null);
     const [result, setResult] = useState<string>();
-    
+    const [hasChanges, setHasChanges] = useState<boolean>(false);
 
-    const { solution, addValue, resetPuzzle, setSolution, transformSolution } = usePuzzleLogic();
+    const { solution, addValue, resetPuzzle, setSolution, transformSolution, solutionToArray } = usePuzzleLogic();
 
     useEffect(() => {
-        // Récupérer les données du state
         const state = location.state as SolutionState;
         if (state && state.solution) {
             setSolutionData(state);
-            setSolution(transformSolution(state.solution));
+            transformSolution(state.solution);
         } else {
-            // Rediriger si pas de données
             console.warn("Aucune donnée de solution trouvée dans le state");
         }
-    }, [location.state]);
+    }, [location.state, transformSolution]);
 
     const handleGoBack = () => {
         navigate(-1); 
@@ -110,10 +151,17 @@ const DetailsPage = () => {
     const onNewValue = (value: React.ChangeEvent<HTMLInputElement>) => {
         const index = value.target.getAttribute("id");
         if (index) {
-            addValue(index, value.target.value, value);
+            const success = addValue(index, value.target.value, value);
+            if (success) {
+                setHasChanges(true); 
+            }
         }
-        console.log("New solution", solution);
     };
+
+    const getSolutionString = useCallback((): string => {
+        const array = solutionToArray();
+        return array.join('');
+    }, [solutionToArray]);
 
     if (!solutionData) {
         return (
@@ -139,57 +187,92 @@ const DetailsPage = () => {
         );
     }
 
-    const HandleModifying = (event: React.FormEvent) => {
+    const HandleModifying = async (event: React.FormEvent) => {
         event.preventDefault();
-       
-       
+        
+        if (!hasChanges) {
+            toast.success("Aucune modification à sauvegarder");
+            return;
+        }
+
+        try {
+            const modifiedSolution = solutionToArray().join('');
+            await modifySolution(solutionData.idSolution, modifiedSolution);
+            
+            setSolutionData(prev => prev ? {
+                ...prev,
+                solution: modifiedSolution.split('').map(Number),
+                positions: modifiedSolution
+            } : null);
+            
+            setHasChanges(false);
+            toast.success("Solution modifiée avec succès!");
+            setTimeout(() => {
+                navigate(solutionData.previousPage || '/', );
+            }, 1000);
+            
+        } catch (error) {
+            console.error("Erreur lors de la modification:", error);
+            toast.error("Erreur lors de la modification de la solution");
+        }
     };
 
     const HandleDelete = async () => {
-        console.log("Deleting solution with ID:", solutionData.idSolution);
-        await deleteSolution(solutionData.idSolution)
+        await deleteSolution(solutionData.idSolution);
         navigate('/history');
     }
 
     return(
         <div className="min-h-screen py-8">
             <div className="max-w-4xl mx-auto px-4">
-                {/* Header avec bouton retour */}
-                <div className="flex items-center mb-6">
+                <div className="flex items-center justify-between mb-6">
                     <button
                         onClick={handleGoBack}
-                        className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition-colors mr-4"
+                        className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition-colors"
                     >
                         <ArrowLeft size={20} className="mr-2" />
                         Retour
                     </button>
+                    
+                    {hasChanges && (
+                        <span className="text-sm text-orange-600 font-medium">
+                            Modifications non sauvegardées
+                        </span>
+                    )}
                 </div>
-                {/* Détails de la solution */}
+
                 <div className="shadow-md rounded-lg p-6 mb-6">
                     <div className="w-2/3 justify-center mx-auto mb-4 h-full">
-                        <PuzzleGrid onChange={onNewValue}  solutions={{ positions: solutionData.positions }} disabled={false}/>
+                        <PuzzleGrid 
+                            onChange={onNewValue}  
+                            solutions={{ positions: getSolutionString() }} 
+                            disabled={false}
+                        />
                     </div>
                 </div>
-                <div className="flex justify-center">                
-                <button 
-                    className="relative inline-flex items-center justify-center p-0.5 mb-4 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-1 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
-                    onClick={HandleModifying}
-                >
-                    <span className="relative px-3 py-1.5 transition-all ease-in duration-75 bg-white dark:bg-gray-700 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
-                        Modifier
-                    </span>
-                </button>
 
-                <button 
-                    className="relative inline-flex items-center justify-center p-0.5 mb-4 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-700 via-red-500 to-red-300 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 focus:ring-1 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400"
-                    onClick={HandleDelete}
-                >
-                    <span className="relative px-3 py-1.5 transition-all ease-in duration-75 bg-white dark:bg-gray-700 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
-                        Supprimer
-                    </span>
-                </button>
-        
-            </div>
+                <div className="flex justify-center">                
+                    <button 
+                        className={`relative inline-flex items-center justify-center p-0.5 mb-4 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-1 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 ${
+                            !hasChanges ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                        onClick={HandleModifying}
+                        disabled={!hasChanges}
+                    >
+                        <span className="relative px-3 py-1.5 transition-all ease-in duration-75 bg-white dark:bg-gray-700 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
+                            Modifier
+                        </span>
+                    </button>
+
+                    <button 
+                        className="relative inline-flex items-center justify-center p-0.5 mb-4 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-700 via-red-500 to-red-300 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 focus:ring-1 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400"
+                        onClick={HandleDelete}
+                    >
+                        <span className="relative px-3 py-1.5 transition-all ease-in duration-75 bg-white dark:bg-gray-700 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
+                            Supprimer
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
     )

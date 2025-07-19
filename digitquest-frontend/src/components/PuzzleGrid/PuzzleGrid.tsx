@@ -2,6 +2,7 @@ import { memo, type ChangeEvent, type FC, type JSX } from "react";
 import Cell from "@/components/PuzzleGrid/Cell";
 import { gridData, solutionDefaultValue, solutionIndexes } from "@/data/PuzzleData";
 import { useNavigate } from "react-router-dom";
+import { P } from "node_modules/framer-motion/dist/types.d-Bq-Qm38R";
 
 
 
@@ -60,15 +61,15 @@ const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
         return <div key={key}></div>;
     };
 
-        const handleNavigate = () => {
-        if (solutionArray) {
+    const handleNavigate = () => {
+        if (solutionArray && PuzzleGridProps.idSolution) {
             navigate('/details', {
                 state: {
                     // Données de la solution
                     solution: solutionArray,
                     positions: PuzzleGridProps.solutions?.positions,
                     idSolution: PuzzleGridProps.idSolution,
-                    // Configuration de la grille
+                    previousPage: location.pathname,
                     gridConfig: {
                         gridData: gridData,
                         solutionIndexes: solutionIndexes,
