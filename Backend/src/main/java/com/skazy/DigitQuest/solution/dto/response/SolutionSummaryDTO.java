@@ -22,6 +22,8 @@ public class SolutionSummaryDTO {
 
     private Long calculationTimeMs;
 
+    private String gridJson;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 }

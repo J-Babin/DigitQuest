@@ -134,6 +134,29 @@ public class SolutionController {
         }
     }
 
+    @PostMapping("solution/check")
+    @Operation(summary = "Vérification d'une solution",
+            description = "Retourne la solution si elle existe")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Solution trouvée"),
+            @ApiResponse(responseCode = "404", description = "Solution non trouvée"),
+            @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
+    })
+    public ResponseEntity<String> checkSolution(@RequestBody JsonNode jsonNod) {
+        String positions = jsonNod.get("positions").asText();
+        int[] array = positions.chars()
+                .map(c -> c - '0')  // Convertit char en int
+                .toArray();
+        BacktrackingSolver solver = new BacktrackingSolver(false);
+        boolean result = solver.isValidSolution2(array);
+        if (result){
+            return ResponseEntity.status(HttpStatus.OK).body("Solution valide");
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Solution invalide");
+    }
+
+
 
     @PostMapping("/generate")
     @Operation(summary = "Generation de toutes les solutions possibles",
@@ -154,5 +177,23 @@ public class SolutionController {
         }
 
         return allSolutions;
+    }
+
+    //delete all solutions
+    @DeleteMapping("/deleteAll")
+    @Operation(summary = "Suppression de toutes les solutions",
+            description = "Retourne status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200" , description = "Solutions delete"),
+            @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
+    })
+    public ResponseEntity<HttpStatus> deleteAllSolutions() {
+        solutionService.deleteAllSolutions();
+        try {
+            solutionService.findAllSolutions();
+            return ResponseEntity.internalServerError().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.ok().build();
+        }
     }
 }

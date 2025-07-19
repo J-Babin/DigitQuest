@@ -49,6 +49,14 @@ public class SolutionService {
         }
         return result;
     }
+
+
+
+    // delete all solutions
+    public void deleteAllSolutions() {
+        solutionRepository.deleteAll();
+    }
+
     @Transactional
     public void deleteSolution(Long solutionId) {
         Optional<SolutionEntity> optionalSolutionEntity = solutionRepository.findById(solutionId);
