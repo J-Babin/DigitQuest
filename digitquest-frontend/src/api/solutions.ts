@@ -20,7 +20,7 @@ export async function generateAllSolutions(): Promise<void> {
 }
 
 
-export async function getFirstSolution(idSolution: number): Promise<void> {
+export async function getFirstSolution(idSolution: number): Promise<Solution> {
   let response = await api.get('/solutions/solution/'+ idSolution);
   
   return response.data;
@@ -56,5 +56,34 @@ export async function deleteAllSolutions(): Promise<void> {
   return response.data;
 }
 
+interface Solution {
+  gridJson: any;
+}
+
+async function getSolutionById(idSolution: string): Promise<Solution> {
+  let response = await api.get('/solutions/solution/' + idSolution);
+  return response.data;
+}
+
+
+export async function deleteSolution(idSolution: string): Promise<void> {
+  let response = await api.delete('/solutions/solution/' + idSolution);
+  
+  return response.data;
+}
+
+export async function modifySolution(idSolution: string, solution: string): Promise<void> {
+  let originalSolution = await getSolutionById(idSolution);
+  console.log("originalSolution:", originalSolution);
+  let data = {
+    "positions": solution,
+    "gridJson": originalSolution.gridJson,
+    "isValid": false,
+    "calculationTimeMs": 0
+  }
+  let response = await api.patch('/solutions/solution/update/' + idSolution, data);
+  
+  // return response.data;
+}
 
 

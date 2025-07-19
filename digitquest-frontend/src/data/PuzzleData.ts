@@ -64,4 +64,24 @@ export const gridData: GridData = {
     "6:5": "x",
     "6:7": ":",
 };
+
+export const templateGridData: GridData = {
+    "1:1": null,
+    "1:3": null,
+    "1:5": null,
+    "5:1": null,
+    "5:3": null,
+    "5:5": null,
+    "5:7": null,
+    "6:2": null,
+    "6:6": null,
+}
+export interface SolutionData {
+    [key: string]: string;
+}
+
+export interface DigitIsUsed {
+    [key: string]: boolean;
+}
+
     

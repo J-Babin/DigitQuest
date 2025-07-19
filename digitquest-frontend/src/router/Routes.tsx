@@ -6,6 +6,7 @@ import Home from '@/pages/HomePage';
 const PuzzlePage = lazy(() => import('@/pages/PuzzlePage'));
 const SearchSolutionPage = lazy(() => import('@/pages/SearchSolutionPage'));
 const HistoryPage = lazy(() => import('@/pages/HistoryPage'));
+const DetailPage = lazy(() => import('@/pages/DetailsPage'));
 
 
 // Composant de loading
@@ -55,54 +56,14 @@ export const routes: RouteObject[] = [
       </LazyWrapper> 
     ),
   }, 
-
-
-
-//   {
-//     path: '/dashboard',
-//     element: (
-//       <LazyWrapper>
-//         <DashboardPage />
-//       </LazyWrapper>
-//     ),
-//   },
-//   {
-//     path: '/solutions',
-//     children: [
-//       {
-//         index: true,
-//         element: (
-//           <LazyWrapper>
-//             <SolutionsPage />
-//           </LazyWrapper>
-//         ),
-//       },
-//       {
-//         path: ':id',
-//         element: (
-//           <LazyWrapper>
-//             <SolutionDetailPage />
-//           </LazyWrapper>
-//         ),
-//       },
-//     ],
-//   },
-//   {
-//     path: '/history',
-//     element: (
-//       <LazyWrapper>
-//         <HistoryPage />
-//       </LazyWrapper>
-//     ),
-//   },
-//   {
-//     path: '/settings',
-//     element: (
-//       <LazyWrapper>
-//         <SettingsPage />
-//       </LazyWrapper>
-//     ),
-//   },
+   {
+    path: '/details',
+    element: (
+      <LazyWrapper>
+        <DetailPage />
+      </LazyWrapper> 
+    ),
+  }, 
   {
     path: '*',
     element: <Navigate to="/" replace />,

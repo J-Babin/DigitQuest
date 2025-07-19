@@ -73,7 +73,7 @@ const HistoryPage = () => {
                         Generate all possible solutions
                     </span>
                 </button>
-                 <button 
+                <button 
                     className="relative inline-flex items-center justify-center p-0.5 mb-3 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-700 via-red-500 to-red-300 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900  focus:outline-none focus:ring-red-100 dark:focus:ring-red-400"
                     onClick={handleDeleteAllSolutions}
                 >
@@ -86,7 +86,7 @@ const HistoryPage = () => {
                <div className="grid grid-cols-2 mx-2 gap-2 overflow-y-auto max-h-full w-screen">
                     {solutions.map((solution, index) => (
                         <div key={index} className="m-2 p-2 shadow-xl/30">
-                            <PuzzleGrid onChange={() => {}} solutions={solutions[index]} />
+                            <PuzzleGrid onChange={() => {}} solutions={solutions[index]} disabled={true} idSolution={solution.id}/>
                         </div>
                     ))}
                 </div>
@@ -96,15 +96,3 @@ const HistoryPage = () => {
 }
 
 export default memo(HistoryPage);
-
-
-
-{/* <div className="m-2 p-2 shadow-xl/30">
-    <PuzzleGrid onChange={() => {}} />
-</div>
-<div className="m-2 p-2  shadow-xl/30">
-    <PuzzleGrid onChange={() => {}} />
-</div>
-<div className="m-2 p-2  shadow-xl/30">
-    <PuzzleGrid onChange={() => {}} />
-</div> */}

@@ -1,6 +1,8 @@
 import { memo, type ChangeEvent, type FC, type JSX } from "react";
 import Cell from "@/components/PuzzleGrid/Cell";
 import { gridData, solutionDefaultValue, solutionIndexes } from "@/data/PuzzleData";
+import { useNavigate } from "react-router-dom";
+
 
 
 
@@ -8,9 +10,13 @@ type PuzzleGridProps = {
     onChange: (value: ChangeEvent<HTMLInputElement>) => void;
     solutions?: { positions: string | Number[];}
     searchPage?: boolean;
+    disabled?: boolean | true;
+    idSolution?: string;
+    callBack?: (value: string) => void;
 }
 
 const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
+    const navigate = useNavigate();
     const ROW: number = 6;
     const COL: number = 7;
     const orderKey = [0, 5, 9, 6, 2, 4, 7, 10, 7]
@@ -38,11 +44,11 @@ const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
             }else if (solutionArray && solutionArray.length > 0) {
                 const value = solutionArray[Number(solutionIndexes[key])];
                 orderKey.shift();
-                return <Cell key={key} index={key} disabled={true} value={value} onChanged={PuzzleGridProps.onChange}></Cell>;
+                return <Cell key={key} index={key} disabled={PuzzleGridProps.disabled} value={value} onChanged={PuzzleGridProps.onChange}></Cell>;
             }
             else if (PuzzleGridProps.searchPage) {
                 const value = solutionDefaultValue[key];
-                return <Cell key={key} index={key} disabled={true} value={value} onChanged={PuzzleGridProps.onChange}></Cell>;
+                return <Cell key={key} index={key} disabled={PuzzleGridProps.disabled} value={value} onChanged={PuzzleGridProps.onChange}></Cell>;
             }
             else{
 
@@ -54,11 +60,30 @@ const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
         return <div key={key}></div>;
     };
 
+        const handleNavigate = () => {
+        if (solutionArray) {
+            navigate('/details', {
+                state: {
+                    // Données de la solution
+                    solution: solutionArray,
+                    positions: PuzzleGridProps.solutions?.positions,
+                    idSolution: PuzzleGridProps.idSolution,
+                    // Configuration de la grille
+                    gridConfig: {
+                        gridData: gridData,
+                        solutionIndexes: solutionIndexes,
+                        solutionDefaultValue: solutionDefaultValue
+                    }
+                }
+            });
+        }
+    }
+
     return(
         <div className="flex flex-col items-center justify-center h-full w-full">
             <div 
                 className="grid grid-rows-6 grid-cols-7 gap-2  place-content-center"
-                onClick={ solutionArray ? () => {alert("Dans l'history")} : undefined }
+                onClick={ solutionArray ? handleNavigate : undefined }
             >
                 {Array.from({ length: ROW }, (_, rowIndex) =>
                     Array.from({ length: COL }, (_, colIndex) =>

@@ -46,7 +46,7 @@ const SearchSolutionPage = () => {
                         console.log("Search results:", result);
                         toast.success(`Solution found for ${position}:${value}`);
                     } else {
-                        setSearchValue([]); // Vider les résultats précédents
+                        setSearchValue([]); 
                         toast.error(`No solution found for ${position}:${value}`);
                     }
                 } catch (error) {
@@ -54,7 +54,7 @@ const SearchSolutionPage = () => {
                     setSearchValue([]);
                     toast.error("Une erreur s'est produite lors de la recherche");
                 } finally {
-                    setLoading(false); // Fin du chargement
+                    setLoading(false);
                 }
                 
                 input.value = "";
@@ -84,15 +84,15 @@ const SearchSolutionPage = () => {
                 <input 
                     type="search" 
                     id="default-search" 
-                    className="block w-full p-4 ps-10 text-sm text-gray-900 rounded-3xl bg-[#E6E8F7] opacity-80 focus:ring-blue-500 border-0 focus:border-blue-500 dark:bg-[#c5ccfa] dark:placeholder-gray-800 placeholder:italic dark:text-gray-800 dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-lg" 
+                    className="block mb-2 w-full p-4 ps-10 text-sm text-gray-900 rounded-3xl bg-[#E6E8F7] opacity-80 focus:ring-blue-500 border-0 focus:border-blue-500 dark:bg-[#c5ccfa] dark:placeholder-gray-800 placeholder:italic dark:text-gray-800 dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-lg" 
                     placeholder="Search by position A:1" 
                     required 
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyPress}
                     disabled={loading}
                 />
                 <button 
                     type="submit" 
-                    className="absolute end-2.5 bottom-2.5 rounded-lg hover:scale-110 hover:bg-[#b5befa] focus:ring-[#7c89db] focus:ring-1 focus:outline-none font-medium text-sm px-2 py-2 bg-white/30 text-gray-800 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="absolute end-2.5 bottom-4.5 rounded-lg hover:scale-110 hover:bg-[#b5befa] focus:ring-[#7c89db] focus:ring-1 focus:outline-none font-medium text-sm px-2 py-2 bg-white/30 text-gray-800 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleSearch}
                     disabled={loading}
                 >
@@ -117,10 +117,12 @@ const SearchSolutionPage = () => {
 
             {hasSearched && searchValue.length > 0 && !loading && (
                 <button 
+                    className="relative inline-flex items-center justify-center p-0.5 mb-3 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-700 via-red-500 to-red-300 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900  focus:outline-none focus:ring-red-100 dark:focus:ring-red-400"
                     onClick={handleClearResults}
-                    className="mt-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200"
                 >
-                    Effacer les résultats
+                    <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
+                        Reset
+                    </span>
                 </button>
             )}
 
@@ -142,7 +144,7 @@ const SearchSolutionPage = () => {
                     <div className="grid grid-cols-2 mx-2 gap-2 overflow-y-auto max-h-full w-screen">
                         {searchValue.map((result, index) => (
                             <div key={index} className="m-2 p-2 shadow-xl/30">
-                                <PuzzleGrid onChange={() => {}} solutions={result} />
+                                <PuzzleGrid onChange={() => {}} solutions={result} disabled={true} idSolution={result.id}/>
                             </div>
                         ))}
                     </div>

@@ -2,14 +2,7 @@ import { useState, useCallback, type ChangeEvent, memo } from "react";
 import { PuzzleGrid } from "@/components/PuzzleGrid/PuzzleGrid";
 import toast from "react-hot-toast";
 import { checkSolution } from "@/api/solutions";
-
-interface SolutionData {
-    [key: string]: string;
-}
-
-interface DigitIsUsed {
-    [key: string]: boolean;
-}
+import { DigitIsUsed, SolutionData } from "@/data/PuzzleData";
 
 const usePuzzleLogic = () => {
     const [solution, setSolution] = useState<SolutionData>({});
@@ -104,6 +97,7 @@ const PuzzlePage = () => {
                         Reset
                     </span>
                 </button>
+        
             </div>
         </div>
     );
