@@ -1,6 +1,7 @@
 import { useState, useCallback, type ChangeEvent, memo } from "react";
 import { PuzzleGrid } from "@/components/PuzzleGrid/PuzzleGrid";
 import toast from "react-hot-toast";
+import { checkSolution } from "@/api/solutions";
 
 interface SolutionData {
     [key: string]: string;
@@ -64,7 +65,18 @@ const PuzzlePage = () => {
             toast.error("Remplissez tous les champs avant de soumettre!");
             return;
         }
-          toast.success("Solution submitted!");
+
+        try {
+            const solutionString = Object.values(solution).join("");
+           
+            checkSolution(solutionString).then(() => {
+                toast.success("Solution is correct!");
+            }).catch(() => {
+                toast.error("Solution is incorrect, try again!");
+            });
+        }catch (error) {
+            toast.error("An error occurred while checking the solution.");
+        }
     };
 
     return (

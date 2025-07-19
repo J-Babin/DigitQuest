@@ -1,4 +1,4 @@
-import { memo, useState, type ChangeEvent, type FC, type JSX } from "react";
+import { memo, type ChangeEvent, type FC, type JSX } from "react";
 import Cell from "@/components/PuzzleGrid/Cell";
 
 interface GridData{
@@ -38,7 +38,6 @@ const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
         "6:5": "x",
         "6:7": ":",
     };
-
     const solutionIndexes : Solution = {
         "1:1": "0",
         "1:3": "4",
@@ -50,8 +49,6 @@ const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
         "6:2": "2",
         "6:6": "7",
     }
-
-
     const solutionArray = PuzzleGridProps.solutions?.positions.toString().split("").map(Number);
 
     
@@ -89,7 +86,10 @@ const PuzzleGridComponent : FC<PuzzleGridProps> = (PuzzleGridProps) => {
 
     return(
         <div className="flex flex-col items-center justify-center h-full w-full">
-            <div className="grid grid-rows-6 grid-cols-7 gap-2  place-content-center">
+            <div 
+                className="grid grid-rows-6 grid-cols-7 gap-2  place-content-center"
+                onClick={ solutionArray ? () => {alert("Dans l'history")} : undefined }
+            >
                 {Array.from({ length: ROW }, (_, rowIndex) =>
                     Array.from({ length: COL }, (_, colIndex) =>
                         renderCell(rowIndex + 1, colIndex + 1)

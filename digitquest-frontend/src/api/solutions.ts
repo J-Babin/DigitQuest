@@ -32,3 +32,14 @@ export async function getAllSolutions(): Promise<void> {
   return response.data;
 }
 
+export async function checkSolution(solution: string): Promise<void> {
+  let data = {
+    "positions": solution
+  }
+  let response = await api.post('solutions/solution/check', data);
+  
+  return response.data;
+}
+
+
+
