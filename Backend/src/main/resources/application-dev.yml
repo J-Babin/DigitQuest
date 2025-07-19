@@ -5,6 +5,7 @@ spring:
     password: passwordDigitQuest
     driver-class-name: org.h2.Driver
 
+
   h2:
     console:
       enabled: true
@@ -27,3 +28,5 @@ logging:
     com.skazy.digitquest: DEBUG
     com.zaxxer.hikari.HikariConfig: DEBUG
     org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration: DEBUG
+server:
+  port: 3000
